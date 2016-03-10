@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ej canvas</title>
+
+  <style>
+    body{
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas" />
+
+
+  <script src="https://cdn.firebase.com/js/client/2.4.1/firebase.js"></script>
+  <script>
+  //inicializo el canvas
+  var canvas = document.getElementById('myCanvas');
+  var context = canvas.getContext('2d');
+  context.canvas.width  = window.innerWidth;
+  context.canvas.height = window.innerHeight;
+  context.fillStyle = '#dddddd';
+  context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+
+  var ref = new Firebase("https://canvasfirebase.firebaseio.com/puntos");
+
+  function colorAleatorio(){
+    return 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
+  }
+
+  canvas.addEventListener("click", function(evento){
+    var x = evento.pageX;
+    var y = evento.pageY;
+    var color = colorAleatorio();
+    ref.push({
+      x: x,
+      y: y,
+      color: color
+    });
+  });
+
+  function dibujarCirculo(context, x, y, color){
+      context.fillStyle = color;
+      context.beginPath();
+      context.arc(x,y,4,0,Math.PI*2,false);
+      context.fill();
+    }
+
+  ref.on("child_added", function(s){
+    var punto = s.val();
+    dibujarCirculo(context, punto.x, punto.y, punto.color);
+  });
+
+  </script>
+</body>
+</html>
